@@ -78,7 +78,7 @@ flags.DEFINE_integer('max_number_of_evaluations', 0,
 
 def main(unused_argv):
   tf.logging.set_verbosity(tf.logging.INFO)
-
+  print("eval dset:", FLAGS.dataset)
   dataset = data_generator.Dataset(
       dataset_name=FLAGS.dataset,
       split_name=FLAGS.eval_split,

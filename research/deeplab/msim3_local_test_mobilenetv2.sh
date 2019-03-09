@@ -22,7 +22,7 @@
 #   sh ./local_test_mobilenetv2.sh
 #
 #
-
+echo "Start"
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
@@ -37,29 +37,30 @@ CURRENT_DIR=$(pwd)
 WORK_DIR="${CURRENT_DIR}/deeplab"
 
 # Run model_test first to make sure the PYTHONPATH is correctly set.
-python "${WORK_DIR}"/model_test.py -v
+#python "${WORK_DIR}"/model_test.py -v
 
-# Go to datasets folder and download PASCAL VOC 2012 segmentation dataset.
 DATASET_DIR="datasets"
-cd "${WORK_DIR}/${DATASET_DIR}"
-sh download_and_convert_voc2012.sh
 
-# Go back to original directory.
-cd "${CURRENT_DIR}"
 
 # Set up the working directories.
-PASCAL_FOLDER="pascal_voc_seg"
-EXP_FOLDER="exp/train_on_trainval_set_mobilenetv2"
-INIT_FOLDER="${WORK_DIR}/${DATASET_DIR}/${PASCAL_FOLDER}/init_models"
-TRAIN_LOGDIR="${WORK_DIR}/${DATASET_DIR}/${PASCAL_FOLDER}/${EXP_FOLDER}/train"
-EVAL_LOGDIR="${WORK_DIR}/${DATASET_DIR}/${PASCAL_FOLDER}/${EXP_FOLDER}/eval"
-VIS_LOGDIR="${WORK_DIR}/${DATASET_DIR}/${PASCAL_FOLDER}/${EXP_FOLDER}/vis"
-EXPORT_DIR="${WORK_DIR}/${DATASET_DIR}/${PASCAL_FOLDER}/${EXP_FOLDER}/export"
+MSIM3_FOLDER="msim3"
+EXP_FOLDER="exp/my_exp"
+INIT_FOLDER="${WORK_DIR}/${DATASET_DIR}/${MSIM3_FOLDER}/init_models"
+TRAIN_LOGDIR="${WORK_DIR}/${DATASET_DIR}/${MSIM3_FOLDER}/${EXP_FOLDER}/train"
+EVAL_LOGDIR="${WORK_DIR}/${DATASET_DIR}/${MSIM3_FOLDER}/${EXP_FOLDER}/eval"
+VIS_LOGDIR="${WORK_DIR}/${DATASET_DIR}/${MSIM3_FOLDER}/${EXP_FOLDER}/vis"
+EXPORT_DIR="${WORK_DIR}/${DATASET_DIR}/${MSIM3_FOLDER}/${EXP_FOLDER}/export"
+echo "1"
 mkdir -p "${INIT_FOLDER}"
+echo "2"
 mkdir -p "${TRAIN_LOGDIR}"
+echo "3"
 mkdir -p "${EVAL_LOGDIR}"
+echo "4"
 mkdir -p "${VIS_LOGDIR}"
+echo "5"
 mkdir -p "${EXPORT_DIR}"
+echo "6"
 
 # Copy locally the trained checkpoint as the initial checkpoint.
 TF_INIT_ROOT="http://download.tensorflow.org/models"
@@ -70,48 +71,56 @@ wget -nd -c "${TF_INIT_ROOT}/${TF_INIT_CKPT}"
 tar -xf "${TF_INIT_CKPT}"
 cd "${CURRENT_DIR}"
 
-PASCAL_DATASET="${WORK_DIR}/${DATASET_DIR}/${PASCAL_FOLDER}/tfrecord"
+MSIM3_DATASET="${WORK_DIR}/${DATASET_DIR}/${MSIM3_FOLDER}/tfrecord"
 
 # Train 10 iterations.
-NUM_ITERATIONS=10
+NUM_ITERATIONS=5000
+echo "Training"
 python "${WORK_DIR}"/train.py \
   --logtostderr \
-  --train_split="trainval" \
+  --train_split="train" \
   --model_variant="mobilenet_v2" \
   --output_stride=16 \
   --train_crop_size=513 \
   --train_crop_size=513 \
-  --train_batch_size=4 \
+  --train_batch_size 8 \
   --training_number_of_steps="${NUM_ITERATIONS}" \
   --fine_tune_batch_norm=true \
-  --tf_initial_checkpoint="${INIT_FOLDER}/${CKPT_NAME}/model.ckpt-30000" \
+  --initialize_last_layer false \
+  --last_layers_contain_logits_only true \
   --train_logdir="${TRAIN_LOGDIR}" \
-  --dataset_dir="${PASCAL_DATASET}"
+  --dataset_dir="${MSIM3_DATASET}" \
+  --dataset msim3
+  #--tf_initial_checkpoint="${INIT_FOLDER}/${CKPT_NAME}/model.ckpt-30000" \
+echo "Done training"
 
 # Run evaluation. This performs eval over the full val split (1449 images) and
 # will take a while.
 # Using the provided checkpoint, one should expect mIOU=75.34%.
+
 python "${WORK_DIR}"/eval.py \
   --logtostderr \
-  --eval_split="val" \
+  --eval_split="test" \
   --model_variant="mobilenet_v2" \
   --eval_crop_size=513 \
   --eval_crop_size=513 \
   --checkpoint_dir="${TRAIN_LOGDIR}" \
   --eval_logdir="${EVAL_LOGDIR}" \
-  --dataset_dir="${PASCAL_DATASET}" \
-  --max_number_of_evaluations=1
+  --dataset_dir="${MSIM3_DATASET}" \
+  --max_number_of_evaluations=1 \
+  --dataset msim3
 
 # Visualize the results.
 python "${WORK_DIR}"/vis.py \
+  --dataset msim3 \
   --logtostderr \
-  --vis_split="val" \
+  --vis_split="test" \
   --model_variant="mobilenet_v2" \
   --vis_crop_size=513 \
   --vis_crop_size=513 \
   --checkpoint_dir="${TRAIN_LOGDIR}" \
   --vis_logdir="${VIS_LOGDIR}" \
-  --dataset_dir="${PASCAL_DATASET}" \
+  --dataset_dir="${MSIM3_DATASET}" \
   --max_number_of_iterations=1
 
 # Export the trained checkpoint.
@@ -123,7 +132,7 @@ python "${WORK_DIR}"/export_model.py \
   --checkpoint_path="${CKPT_PATH}" \
   --export_path="${EXPORT_PATH}" \
   --model_variant="mobilenet_v2" \
-  --num_classes=21 \
+  --num_classes=34 \
   --crop_size=513 \
   --crop_size=513 \
   --inference_scales=1.0 \
