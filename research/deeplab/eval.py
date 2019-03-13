@@ -105,7 +105,7 @@ def main(unused_argv):
         crop_size=FLAGS.eval_crop_size,
         atrous_rates=FLAGS.atrous_rates,
         output_stride=FLAGS.output_stride)
-
+    print("Eval crop:", FLAGS.eval_crop_size[0], FLAGS.eval_crop_size[1])
     # Set shape in order for tf.contrib.tfprof.model_analyzer to work properly.
     samples[common.IMAGE].set_shape(
         [FLAGS.eval_batch_size,
@@ -154,13 +154,14 @@ def main(unused_argv):
     if FLAGS.max_number_of_evaluations > 0:
       num_eval_iters = FLAGS.max_number_of_evaluations
 
-    tf.contrib.tfprof.model_analyzer.print_model_analysis(
-        tf.get_default_graph(),
-        tfprof_options=tf.contrib.tfprof.model_analyzer.
-        TRAINABLE_VARS_PARAMS_STAT_OPTIONS)
-    tf.contrib.tfprof.model_analyzer.print_model_analysis(
-        tf.get_default_graph(),
-        tfprof_options=tf.contrib.tfprof.model_analyzer.FLOAT_OPS_OPTIONS)
+    #tf.contrib.tfprof.model_analyzer.print_model_analysis(
+    #    tf.get_default_graph(),
+    #    tfprof_options=tf.contrib.tfprof.model_analyzer.
+    #    TRAINABLE_VARS_PARAMS_STAT_OPTIONS)
+    #tf.contrib.tfprof.model_analyzer.print_model_analysis(
+    #    tf.get_default_graph(),
+    #    tfprof_options=tf.contrib.tfprof.model_analyzer.FLOAT_OPS_OPTIONS)
+    print("ASDASDASD")
     tf.contrib.training.evaluate_repeatedly(
         master=FLAGS.master,
         checkpoint_dir=FLAGS.checkpoint_dir,

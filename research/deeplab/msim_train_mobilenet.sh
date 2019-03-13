@@ -74,68 +74,24 @@ cd "${CURRENT_DIR}"
 MSIM3_DATASET="${WORK_DIR}/${DATASET_DIR}/${MSIM3_FOLDER}/tfrecord"
 
 # Train 10 iterations.
-NUM_ITERATIONS=5000
+NUM_ITERATIONS=10000
 echo "Training"
 python "${WORK_DIR}"/train.py \
   --logtostderr \
   --train_split="train" \
   --model_variant="mobilenet_v2" \
-  --output_stride=16 \
+  --output_stride=8 \
   --train_crop_size=513 \
   --train_crop_size=513 \
-  --train_batch_size 8 \
+  --train_batch_size=8 \
   --training_number_of_steps="${NUM_ITERATIONS}" \
+  --tf_initial_checkpoint="${INIT_FOLDER}/${CKPT_NAME}/model.ckpt-30000" \
   --fine_tune_batch_norm=true \
-  --initialize_last_layer false \
-  --last_layers_contain_logits_only true \
+  --initialize_last_layer=false \
+  --last_layers_contain_logits_only=true \
   --train_logdir="${TRAIN_LOGDIR}" \
   --dataset_dir="${MSIM3_DATASET}" \
-  --dataset msim3
-  #--tf_initial_checkpoint="${INIT_FOLDER}/${CKPT_NAME}/model.ckpt-30000" \
+  --dataset=msim3 \
+  --save_summaries_images=true
 echo "Done training"
 
-# Run evaluation. This performs eval over the full val split (1449 images) and
-# will take a while.
-# Using the provided checkpoint, one should expect mIOU=75.34%.
-
-python "${WORK_DIR}"/eval.py \
-  --logtostderr \
-  --eval_split="test" \
-  --model_variant="mobilenet_v2" \
-  --eval_crop_size=513 \
-  --eval_crop_size=513 \
-  --checkpoint_dir="${TRAIN_LOGDIR}" \
-  --eval_logdir="${EVAL_LOGDIR}" \
-  --dataset_dir="${MSIM3_DATASET}" \
-  --max_number_of_evaluations=1 \
-  --dataset msim3
-
-# Visualize the results.
-python "${WORK_DIR}"/vis.py \
-  --dataset msim3 \
-  --logtostderr \
-  --vis_split="test" \
-  --model_variant="mobilenet_v2" \
-  --vis_crop_size=513 \
-  --vis_crop_size=513 \
-  --checkpoint_dir="${TRAIN_LOGDIR}" \
-  --vis_logdir="${VIS_LOGDIR}" \
-  --dataset_dir="${MSIM3_DATASET}" \
-  --max_number_of_iterations=1
-
-# Export the trained checkpoint.
-CKPT_PATH="${TRAIN_LOGDIR}/model.ckpt-${NUM_ITERATIONS}"
-EXPORT_PATH="${EXPORT_DIR}/frozen_inference_graph.pb"
-
-python "${WORK_DIR}"/export_model.py \
-  --logtostderr \
-  --checkpoint_path="${CKPT_PATH}" \
-  --export_path="${EXPORT_PATH}" \
-  --model_variant="mobilenet_v2" \
-  --num_classes=34 \
-  --crop_size=513 \
-  --crop_size=513 \
-  --inference_scales=1.0 \
-  --max_number_of_iterations=1
-# Run inference with the exported checkpoint.
-# Please refer to the provided deeplab_demo.ipynb for an example.

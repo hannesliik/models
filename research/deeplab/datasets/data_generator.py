@@ -96,10 +96,20 @@ _ADE20K_INFORMATION = DatasetDescriptor(
     ignore_label=0,
 )
 
+_SIM3_INFORMATION = DatasetDescriptor(
+    splits_to_sizes={
+        'train': 1943,  # num of samples in train/image
+        'val': 628,  # num of samples in test/image
+    },
+    num_classes=34,
+    ignore_label=0,
+)
+
 _DATASETS_INFORMATION = {
     'cityscapes': _CITYSCAPES_INFORMATION,
     'pascal_voc_seg': _PASCAL_VOC_SEG_INFORMATION,
     'ade20k': _ADE20K_INFORMATION,
+    'msim3': _SIM3_INFORMATION,
 }
 
 # Default file pattern of TFRecord of TensorFlow Example.
@@ -157,12 +167,14 @@ class Dataset(object):
     Raises:
       ValueError: Dataset name and split name are not supported.
     """
+
     if dataset_name not in _DATASETS_INFORMATION:
       raise ValueError('The specified dataset is not supported yet.')
     self.dataset_name = dataset_name
 
     splits_to_sizes = _DATASETS_INFORMATION[dataset_name].splits_to_sizes
-
+    print(dataset_name, split_name)
+    print(splits_to_sizes)
     if split_name not in splits_to_sizes:
       raise ValueError('data split name %s not recognized' % split_name)
 
@@ -235,10 +247,10 @@ class Dataset(object):
     image = _decode_image(parsed_features['image/encoded'], channels=3)
 
     label = None
-    if self.split_name != common.TEST_SET:
-      label = _decode_image(
-          parsed_features['image/segmentation/class/encoded'], channels=1)
-
+    #if self.split_name != common.TEST_SET:
+    #  label = _decode_image(
+    #      parsed_features['image/segmentation/class/encoded'], channels=1)
+    label = _decode_image(parsed_features['image/segmentation/class/encoded'], channels=1)
     image_name = parsed_features['image/filename']
     if image_name is None:
       image_name = tf.constant('')
@@ -277,6 +289,7 @@ class Dataset(object):
     Raises:
       ValueError: Ground truth label not provided during training.
     """
+    print(sample)
     image = sample[common.IMAGE]
     label = sample[common.LABELS_CLASS]
 
@@ -318,7 +331,7 @@ class Dataset(object):
     """
 
     files = self._get_all_files()
-
+    print("files:", files)
     dataset = (
         tf.data.TFRecordDataset(files, num_parallel_reads=self.num_readers)
         .map(self._parse_function, num_parallel_calls=self.num_readers)

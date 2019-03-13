@@ -24,16 +24,23 @@ VIS_LOGDIR="${WORK_DIR}/${DATASET_DIR}/${MSIM3_FOLDER}/${EXP_FOLDER}/vis"
 EXPORT_DIR="${WORK_DIR}/${DATASET_DIR}/${MSIM3_FOLDER}/${EXP_FOLDER}/export"
 MSIM3_DATASET="${WORK_DIR}/${DATASET_DIR}/${MSIM3_FOLDER}/tfrecord"
 
-
+echo ${TRAIN_LOGDIR}
 python "${WORK_DIR}"/eval.py \
   --logtostderr \
-  --eval_split="test" \
+  --eval_split="val" \
   --model_variant="mobilenet_v2" \
-  --eval_crop_size=513 \
-  --eval_crop_size=513 \
-  --output_stride=16 \
+  --dataset=msim3 \
   --checkpoint_dir="${TRAIN_LOGDIR}" \
   --eval_logdir="${EVAL_LOGDIR}" \
   --dataset_dir="${MSIM3_DATASET}" \
-  --max_number_of_evaluations=0 \
-  --dataset msim3
+#  --eval_crop_size=513 \
+#  --eval_crop_size=513 \
+#  --output_stride=16 \
+#  --max_number_of_evaluations=0 \
+#  --train_crop_size=513 \
+#  --train_crop_size=513 \
+#  --train_batch_size 8 \
+#  --fine_tune_batch_norm=true \
+#  --initialize_last_layer false \
+#  --last_layers_contain_logits_only true \
+#  --train_logdir="${TRAIN_LOGDIR}" \
