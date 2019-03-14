@@ -44,7 +44,7 @@ DATASET_DIR="datasets"
 
 # Set up the working directories.
 MSIM3_FOLDER="msim3"
-EXP_FOLDER="exp/my_exp"
+EXP_FOLDER="exp/deeplab"
 INIT_FOLDER="${WORK_DIR}/${DATASET_DIR}/${MSIM3_FOLDER}/init_models"
 TRAIN_LOGDIR="${WORK_DIR}/${DATASET_DIR}/${MSIM3_FOLDER}/${EXP_FOLDER}/train"
 EVAL_LOGDIR="${WORK_DIR}/${DATASET_DIR}/${MSIM3_FOLDER}/${EXP_FOLDER}/eval"
@@ -74,16 +74,17 @@ cd "${CURRENT_DIR}"
 MSIM3_DATASET="${WORK_DIR}/${DATASET_DIR}/${MSIM3_FOLDER}/tfrecord"
 
 # Train 10 iterations.
-NUM_ITERATIONS=10000
+NUM_ITERATIONS=30000
 echo "Training"
-python "${WORK_DIR}"/train.py \
+CUDA_VISIBLE_DEVICES="1,2,3" python "${WORK_DIR}"/train.py \
   --logtostderr \
   --train_split="train" \
   --model_variant="mobilenet_v2" \
   --output_stride=8 \
+  --num_clones=3 \
   --train_crop_size=513 \
   --train_crop_size=513 \
-  --train_batch_size=8 \
+  --train_batch_size=24 \
   --training_number_of_steps="${NUM_ITERATIONS}" \
   --tf_initial_checkpoint="${INIT_FOLDER}/${CKPT_NAME}/model.ckpt-30000" \
   --fine_tune_batch_norm=true \

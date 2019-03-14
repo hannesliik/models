@@ -29,7 +29,7 @@ TRAIN_LOGDIR="${WORK_DIR}/${DATASET_DIR}/${DATASET_NAME}/${EXP_FOLDER}/train"
 EXPORT_DIR="${WORK_DIR}/${DATASET_DIR}/${DATASET_NAME}/${EXP_FOLDER}/export"
 
 # Export the trained checkpoint.
-
+mkdir -p ${EXPORT_DIR}
 echo $NUM_ITERATIONS
 CKPT_PATH="${TRAIN_LOGDIR}/model.ckpt-${NUM_ITERATIONS}"
 EXPORT_PATH="${EXPORT_DIR}/frozen_inference_graph.pb"
