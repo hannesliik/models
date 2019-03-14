@@ -71,7 +71,7 @@ wget -nd -c "${TF_INIT_ROOT}/${TF_INIT_CKPT}"
 tar -xf "${TF_INIT_CKPT}"
 cd "${CURRENT_DIR}"
 
-MSIM3_DATASET="${WORK_DIR}/${DATASET_DIR}/${MSIM3_FOLDER}/tfrecord"
+TFRECORD_DIR="${WORK_DIR}/${DATASET_DIR}/${MSIM3_FOLDER}/tfrecord"
 
 # Train 10 iterations.
 NUM_ITERATIONS=30000
@@ -91,7 +91,7 @@ CUDA_VISIBLE_DEVICES="1,2,3" python "${WORK_DIR}"/train.py \
   --initialize_last_layer=false \
   --last_layers_contain_logits_only=true \
   --train_logdir="${TRAIN_LOGDIR}" \
-  --dataset_dir="${MSIM3_DATASET}" \
+  --dataset_dir="${TFRECORD_DIR}" \
   --dataset=msim3 \
   --save_summaries_images=true
 echo "Done training"

@@ -24,7 +24,7 @@ DATASET_DIR="datasets"
 
 # Set up the working directories.
 DATASET_NAME="msim3"
-EXP_FOLDER="exp/deeplab"
+EXP_FOLDER="exp/deeplab_xception"
 INIT_FOLDER="${WORK_DIR}/${DATASET_DIR}/${DATASET_NAME}/init_models"
 TRAIN_LOGDIR="${WORK_DIR}/${DATASET_DIR}/${DATASET_NAME}/${EXP_FOLDER}/train"
 EXPORT_DIR="${WORK_DIR}/${DATASET_DIR}/${DATASET_NAME}/${EXP_FOLDER}/export"

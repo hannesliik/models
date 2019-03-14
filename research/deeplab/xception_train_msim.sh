@@ -28,8 +28,8 @@ EXPORT_DIR="${WORK_DIR}/${DATASET_DIR}/${DATASET_FOLDER}/${EXP_FOLDER}/export"
 echo "INIT_FOLDER=${INIT_FOLDER}"
 echo "DATASET_FOLDER=${DATASET_FOLDER}"
 echo "EXP_FOLDER=${EXP_FOLDER}"
-echp "TRAIN_LOGDIR=${TRAIN_LOGDIR}"
-echp "EXPORT_DIR=${EXPORT_DIR}"
+echo "TRAIN_LOGDIR=${TRAIN_LOGDIR}"
+echo "EXPORT_DIR=${EXPORT_DIR}"
 
 mkdir -p "${INIT_FOLDER}"
 mkdir -p "${TRAIN_LOGDIR}"
@@ -45,16 +45,15 @@ tar -xf "${TF_INIT_CKPT}"
 cd "${CURRENT_DIR}"
 
 
-MSIM3_DATASET="${WORK_DIR}/${DATASET_DIR}/${DATASET_FOLDER}/tfrecord"
+TFRECORD_DIR="${WORK_DIR}/${DATASET_DIR}/${DATASET_FOLDER}/tfrecord"
 
 # Train 10 iterations.
-NUM_ITERATIONS=30000
+NUM_ITERATIONS=10000
 echo "Training"
-
-NUM_ITERATIONS=10
-python "${WORK_DIR}"/train.py \
+CUDA_VISIBLE_DEVICES="1,2,3" python "${WORK_DIR}"/train.py \
+  --num_clones=3 \
   --logtostderr \
-  --train_split="trainval" \
+  --train_split="train" \
   --model_variant="xception_65" \
   --atrous_rates=6 \
   --atrous_rates=12 \
@@ -63,9 +62,12 @@ python "${WORK_DIR}"/train.py \
   --decoder_output_stride=4 \
   --train_crop_size=513 \
   --train_crop_size=513 \
-  --train_batch_size=4 \
-  --training_number_of_steps="${NUM_ITERATIONS}" \
+  --train_batch_size=18 \
+  --dataset=msim3 \
   --fine_tune_batch_norm=true \
+  --initialize_last_layer=false \
+  --last_layers_contain_logits_only=true \
+  --training_number_of_steps="${NUM_ITERATIONS}" \
   --tf_initial_checkpoint="${INIT_FOLDER}/deeplabv3_pascal_train_aug/model.ckpt" \
   --train_logdir="${TRAIN_LOGDIR}" \
-  --dataset_dir="${PASCAL_DATASET}"
+  --dataset_dir="${TFRECORD_DIR}"
