@@ -353,7 +353,8 @@ def _train_deeplab_model(iterator, num_of_classes, ignore_label):
       FLAGS.slow_start_step, FLAGS.slow_start_learning_rate)
   summaries.append(tf.summary.scalar('learning_rate', learning_rate))
 
-  optimizer = tf.train.MomentumOptimizer(learning_rate, FLAGS.momentum)
+  #optimizer = tf.train.MomentumOptimizer(learning_rate, FLAGS.momentum)
+  optimizer = tf.train.AdamOptimizer(learning_rate, FLAGS.momentum)
 
   tower_grads = []
   tower_summaries = None
