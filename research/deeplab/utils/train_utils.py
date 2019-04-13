@@ -18,7 +18,7 @@ import six
 
 import tensorflow as tf
 from deeplab.core import preprocess_utils
-
+from deeplab.class_weights import msim_weights
 
 def _div_maybe_zero(total_loss, num_present):
   """Normalizes the total loss with the number of present pixels."""
@@ -30,7 +30,7 @@ def add_softmax_cross_entropy_loss_for_each_scale(scales_to_logits,
                                                   labels,
                                                   num_classes,
                                                   ignore_label,
-                                                  loss_weight=1.0,
+                                                  loss_weight=msim_weights,#1.0,
                                                   upsample_logits=True,
                                                   hard_example_mining_step=0,
                                                   top_k_percent_pixels=1.0,

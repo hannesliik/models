@@ -1,42 +1,3 @@
-# Copyright 2018 The TensorFlow Authors All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-
-"""Converts MSIM3 data to TFRecord file format with Example protos.
-
-MSIM3 dataset is expected to have the following directory structure:
-
-  + msim3
-    - build_data.py
-    - build_msim3_data.py (current working directory).
-    - train.txt
-    - test.txt
-    + tfrecord
-
-This script converts data into sharded data files and save at tfrecord folder.
-
-The Example proto contains the following fields:
-
-  image/encoded: encoded image content.
-  image/filename: image filename.
-  image/format: image file format.
-  image/height: image height.
-  image/width: image width.
-  image/channels: image channels.
-  image/segmentation/class/encoded: encoded semantic segmentation content.
-  image/segmentation/class/format: semantic segmentation file format.
-"""
 import math
 import os.path
 import sys
@@ -44,15 +5,6 @@ import build_data
 import tensorflow as tf
 
 FLAGS = tf.app.flags.FLAGS
-
-#tf.app.flags.DEFINE_string('image_folder',
-#                           './VOCdevkit/VOC2012/JPEGImages',
-#                           'Folder containing images.')
-
-#tf.app.flags.DEFINE_string(
-#    'semantic_segmentation_folder',
-#    './VOCdevkit/VOC2012/SegmentationClassRaw',
-#    'Folder containing semantic segmentation annotations.')
 
 tf.app.flags.DEFINE_string(
     'list_folder',
@@ -64,8 +16,11 @@ tf.app.flags.DEFINE_string(
     './tfrecord',
     'Path to save converted SSTable of TensorFlow examples.')
 
-
-_NUM_SHARDS = 8
+tf.app.flags.DEFINE_integer(
+    'num_shards',
+    16,
+    'Number of sharts to split the data into')
+_NUM_SHARDS = 16
 
 
 def _convert_dataset(dataset_split):
@@ -120,6 +75,7 @@ def _convert_dataset(dataset_split):
 
 def main(unused_argv):
   dataset_splits = tf.gfile.Glob(os.path.join(FLAGS.list_folder, '*.txt'))
+  _NUM_SHARDS = FLAGS.num_shards
   for dataset_split in dataset_splits:
     _convert_dataset(dataset_split)
 

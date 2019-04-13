@@ -96,7 +96,7 @@ class DeepLab(object):
         seg_map = batch_seg_map[0]
         return seg_map
 
-    def predict_visual(self, image_arr):
+    def predict_image(self, image_arr):
         seg_map = self.run(image_arr)
         if seg_map.ndim != 2:
             raise ValueError('Expect 2-D input label')
@@ -118,7 +118,6 @@ class DeepLab(object):
 
 
 if __name__ == "__main__":
-    print("yay")
     parser = argparse.ArgumentParser()
     parser.add_argument("model", type=str, help="Model .tar path")
     parser.add_argument("--input_dir", type=str, help="Path to the directory of input images")
@@ -139,7 +138,7 @@ if __name__ == "__main__":
         with open(image_path, 'rb') as fp:
             img = Image.open(fp).convert('RGB')
             width, height = img.size
-        pred = deeplab.predict_visual(img)
+        pred = deeplab.predict_image(img)
         # Upscale prediction to the original image
         pred = cv2.resize(pred, (width, height), interpolation=cv2.INTER_NEAREST)
         cv2.imwrite(os.path.join(args.output_dir, image_name), cv2.cvtColor(pred, cv2.COLOR_RGB2BGR))

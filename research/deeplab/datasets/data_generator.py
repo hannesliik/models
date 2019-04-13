@@ -104,13 +104,30 @@ _SIM3_INFORMATION = DatasetDescriptor(
     num_classes=34,
     ignore_label=0,
 )
-
+_AUGSIM3_INFORMATION = DatasetDescriptor(
+    splits_to_sizes={
+        'train': 29145,  # num of samples in train/image
+        'val': 1943,  # num of samples in test/image
+    },
+    num_classes=34,
+    ignore_label=0,
+)
 _DATASETS_INFORMATION = {
     'cityscapes': _CITYSCAPES_INFORMATION,
     'pascal_voc_seg': _PASCAL_VOC_SEG_INFORMATION,
     'ade20k': _ADE20K_INFORMATION,
     'msim3': _SIM3_INFORMATION,
+    'aug_msim': _AUGSIM3_INFORMATION,
+    'msim4': _AUGSIM4_INFORMATION,
 }
+_AUGSIM4_INFORMATION = DatasetDescriptor(
+    splits_to_sizes={
+        'train': 18530,  # num of samples in train/image
+#        'val': 628,  # num of samples in test/image
+    },
+    num_classes=34,
+    ignore_label=0,
+)
 
 # Default file pattern of TFRecord of TensorFlow Example.
 _FILE_PATTERN = '%s-*'
@@ -136,7 +153,7 @@ class Dataset(object):
                max_scale_factor=1.,
                scale_factor_step_size=0,
                model_variant=None,
-               num_readers=1,
+               num_readers=6, #1,
                is_training=False,
                should_shuffle=False,
                should_repeat=False):
